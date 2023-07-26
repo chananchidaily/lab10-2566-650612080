@@ -16,7 +16,7 @@ export default function RandomUserPage() {
       setIsFIrstLoad(false);
       return;
     }
-    const strGenAmout = JSON.stringify(genAmount); //แปลงobject=>string
+    const strGenAmout = JSON.stringify(genAmount);
     //console.log(strGenAmout)
     localStorage.setItem("genAmount", strGenAmout);
   }, [genAmount]);
@@ -27,7 +27,7 @@ export default function RandomUserPage() {
       setGenAmount(0);
       return;
     }
-    const loadedgenAmout = JSON.parse(strGenAmout); //เปลี่ยนstring=>object
+    const loadedgenAmout = JSON.parse(strGenAmout);
     setGenAmount(loadedgenAmout);
   }, []);
 
