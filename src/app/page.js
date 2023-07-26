@@ -1,13 +1,35 @@
 "use client";
 
+import { UserCard } from "@/components/UserCard";
+import { cleanUser } from "@/libs/cleanUser";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function RandomUserPage() {
   //user = null or array of object
   const [users, setUsers] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [genAmount, setGenAmount] = useState(1);
+  const [genAmount, setGenAmount] = useState();
+  const [isFirstLoad, setIsFIrstLoad] = useState(true);
+  useEffect(() => {
+    if (isFirstLoad) {
+      setIsFIrstLoad(false);
+      return;
+    }
+    const strGenAmout = JSON.stringify(genAmount); //แปลงobject=>string
+    //console.log(strGenAmout)
+    localStorage.setItem("genAmount", strGenAmout);
+  }, [genAmount]);
+
+  useEffect(() => {
+    const strGenAmout = localStorage.getItem("genAmount");
+    if (strGenAmout === null) {
+      setGenAmount(0);
+      return;
+    }
+    const loadedgenAmout = JSON.parse(strGenAmout); //เปลี่ยนstring=>object
+    setGenAmount(loadedgenAmout);
+  }, []);
 
   const generateBtnOnClick = async () => {
     setIsLoading(true);
@@ -16,9 +38,8 @@ export default function RandomUserPage() {
     );
     setIsLoading(false);
     const users = resp.data.results;
-    //Your code here
-    //Process result from api response with map function. Tips use function from /src/libs/cleanUser
-    //Then update state with function : setUsers(...)
+    const cleanedUser = users.map((user) => cleanUser(user));
+    setUsers(cleanedUser);
   };
 
   return (
@@ -40,7 +61,17 @@ export default function RandomUserPage() {
       {isLoading && (
         <p className="display-6 text-center fst-italic my-4">Loading ...</p>
       )}
-      {users && !isLoading && users.map(/*code map rendering UserCard here */)}
+      {users &&
+        !isLoading &&
+        users.map((user) => (
+          <UserCard
+            key={user.email}
+            name={user.name}
+            imgUrl={user.imgUrl}
+            address={user.address}
+            email={user.email}
+          />
+        ))}
     </div>
   );
 }
